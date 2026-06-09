@@ -1,113 +1,167 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
+#include <string>
+#include <iomanip>
+
 using namespace std;
-struct Main{
-    int totalsubject;
+
+struct Student {
     string Name;
     string year;
-    int semister;
+    int semester;
     vector<string> Subject;
     vector<double> Marks;
     int eachsubmarks;
-    int totalmarks;
-    vector<char> Grade;
     vector<int> credits;
 };
-double Eachsubjectpercentage(int mark, int total){
-    double ans = ((double)mark*100) / total;
-    return double(ans);
+
+// Calculate percentage dynamically based on full marks
+double Eachsubjectpercentage(double mark, double total){
+    if (total == 0) return 0.0;
+    return (mark * 100.0) / total;
 }
-double EachsubjectCGPA(int mark, int total){
-    double ans = ( (double)mark *100)/ total ;
-    return double(ans/10);
+
+// Calculate CGPA dynamically (out of 10)
+double EachsubjectCGPA(double mark, double total){
+    if (total == 0) return 0.0;
+    return (mark * 10.0) / total;
 }
-char EachsubjectGrade(double cgpa){
-    if(cgpa == 10) return 'O'; 
-    else if(cgpa >= 9 && cgpa < 10) return 'A';
-    else if(cgpa >= 8 && cgpa < 9) return 'B';
-    else if(cgpa >= 7 && cgpa < 8) return 'C';
-    else if(cgpa >= 6 && cgpa < 7) return 'D';
+
+// Determine grade (returns 'F' if marks are below passing threshold of 35%)
+char EachsubjectGrade(double cgpa, double mark, double total){
+    if (total == 0 || (mark / total) < 0.35) return 'F';
+    
+    if (cgpa >= 9.5) return 'O'; 
+    else if (cgpa >= 8.5) return 'A';
+    else if (cgpa >= 7.5) return 'B';
+    else if (cgpa >= 6.5) return 'C';
+    else if (cgpa >= 5.0) return 'D';
     else return 'E';
 }
-char PassorFail(int marks){
-    if(marks < 35) return 'F';
-    else return 'P';
+
+char PassorFail(double mark, double total){
+    if (total == 0 || (mark / total) < 0.35) return 'F';
+    return 'P';
 }
-int credits(int marks, int c){
-    if(marks < 35) return 0;
-    else return c;
+
+int GetEarnedCredits(double mark, double total, int creditValue){
+    if (total == 0 || (mark / total) < 0.35) return 0;
+    return creditValue;
 }
-char result(int earned , int totalcredits) {
-    if(earned == totalcredits) return 'P';
-    else return 'F';
+
+char result(int earned, int totalcredits) {
+    if (earned == totalcredits && totalcredits > 0) return 'P';
+    return 'F';
 }
+
 int main(){
-    struct Main call;
-    int a ;
-    cout << "enter Name : ";
-    cin >> call.Name ;
-    cout << "Enter Year : ";
-    cin >> call.year ;
-    cout << "Enter Semister : ";
-    cin >> call.semister ;
-    cout << "Enter total subjets number : ";
-    cin >> a;
-    call.Subject.resize(a);
-    call.Marks.resize(a);
-    call.credits.resize(a);
-    call.Grade.resize(a);
-    cout << "Enter Total Subjets Names: " ;
-    for(int i = 0; i < a; i++){
-        cin >> call.Subject[i];
-    }
-    cout << "Enter Marks : " ;
-    for(int i = 0; i < a; i++){
-        cin >> call.Marks[i];
-    }
-    cout << "Enter full marks for subject:";
+    Student call;
+    int numSubjects;
+    
+    cout << "Enter Name: ";
+    getline(cin >> ws, call.Name);
+    
+    cout << "Enter Year: ";
+    getline(cin >> ws, call.year);
+    
+    cout << "Enter Semester: ";
+    cin >> call.semester;
+    
+    cout << "Enter total subjects number: ";
+    cin >> numSubjects;
+    
+    call.Subject.resize(numSubjects);
+    call.Marks.resize(numSubjects);
+    call.credits.resize(numSubjects);
+    
+    cout << "Enter full marks for each subject: ";
     cin >> call.eachsubmarks;
-    cout << "Enter Credits : " ;
-    for(int i = 0; i < a; i++){
+    
+    for(int i = 0; i < numSubjects; i++){
+        cout << "Enter Subject " << i + 1 << " Name: ";
+        getline(cin >> ws, call.Subject[i]);
+        
+        cout << "Enter Marks for " << call.Subject[i] << ": ";
+        cin >> call.Marks[i];
+        
+        cout << "Enter Credits for " << call.Subject[i] << ": ";
         cin >> call.credits[i];
     }
-    int studenttotalmarks = 0;
-    for(int i = 0; i < a; i++){
-        studenttotalmarks += call.Marks[i];
-    }
+    
     int totalcredits = 0;
-    for(int i = 0; i < a; i++){
-        totalcredits +=  call.credits[i];
+    for(int i = 0; i < numSubjects; i++){
+        totalcredits += call.credits[i];
     }
-    cout << "=================== Marks Memo =======================" << endl;
+    
+    cout << "\n=================== Marks Memo =======================" << endl;
     double totalcgpa = 0;
     int earnedcredits = 0;
-    cout << "Name : " << call.Name <<  endl;
-    cout << "Year : " << call.year << endl;
-    cout << "Semister : " << call.semister << endl;
-    cout << "------------------------------------------------------" << endl;
-    cout << setw(4) << "SI.No "
-         << setw(9) << "Subject"
-         << setw(7) << "Marks"
-         << setw(8) << "credits"
+    
+    cout << "Name     : " << call.Name <<  endl;
+    cout << "Year     : " << call.year << endl;
+    cout << "Semester : " << call.semester << endl;
+    cout << "--------------------------------------------------------" << endl;
+    cout << left << setw(8) << "Sl. No."
+         << setw(20) << "Subject"
+         << right << setw(7) << "Marks"
+         << setw(9) << "Credits"
          << setw(8) << "CGPA" 
-         << setw(7) << "Grade" 
-         << setw(10) << "Pass/Fail"<< endl;
-    cout << "-------------------------------------------------------" << endl;
-   for(int i = 0; i < a; i++){ 
-    double per = Eachsubjectpercentage(call.Marks[i], call.eachsubmarks);
-    double cgpa = EachsubjectCGPA(call.Marks[i], call.eachsubmarks);
-    int Credits = credits(call.Marks[i], call.credits[i]);
-    totalcgpa += cgpa * call.credits[i];
-    earnedcredits += Credits;
-    cout << setw(4) << i+1 
-         << setw(9) << call.Subject[i] 
-         << setw(7) << call.Marks[i] 
-         <<  setw(8) << credits(call.Marks[i], call.credits[i]) 
-         <<  setw(8) << cgpa 
-         << setw(7) << EachsubjectGrade(cgpa) 
-         << setw(10) << PassorFail(call.Marks[i]) <<  endl;
-}
-    cout << "------------------------------------------------------" << endl;
-    cout << "Total CGPA : " << double(totalcgpa / totalcredits) << setprecision(2)<< "/10"  << endl;
+         << setw(8) << "Grade" 
+         << setw(11) << "Pass/Fail" << endl;
+    cout << "--------------------------------------------------------" << endl;
+    
+    for(int i = 0; i < numSubjects; i++){ 
+        double cgpa = EachsubjectCGPA(call.Marks[i], call.eachsubmarks);
+        int Credits = GetEarnedCredits(call.Marks[i], call.eachsubmarks, call.credits[i]);
+        totalcgpa += cgpa * call.credits[i];
+        earnedcredits += Credits;
+        
+        cout << left << setw(8) << i + 1 
+             << setw(20) << call.Subject[i] 
+             << right << setw(7) << call.Marks[i] 
+             << setw(9) << call.credits[i] 
+             << setw(8) << fixed << setprecision(2) << cgpa 
+             << setw(8) << EachsubjectGrade(cgpa, call.Marks[i], call.eachsubmarks) 
+             << setw(11) << PassorFail(call.Marks[i], call.eachsubmarks) << endl;
+    }
+    
+    cout << "--------------------------------------------------------" << endl;
+    double finalCGPA = (totalcredits > 0) ? (totalcgpa / totalcredits) : 0.0;
+    cout << "Total CGPA    : " << fixed << setprecision(2) << finalCGPA << "/10"  << endl;
     cout << "Total Credits : " << earnedcredits << "/" << totalcredits << endl;
-    cout << "Result : " << result(earnedcredits, totalcredits) << endl;
+    cout << "Result        : " << result(earnedcredits, totalcredits) << endl;
+    
+    return 0;
 }
+
+/*
+Enter Name: John Doe
+Enter Year: 2nd Year
+Enter Semester: 4
+Enter total subjects number: 3
+Enter full marks for each subject: 100
+Enter Subject 1 Name: Mathematics
+Enter Marks for Mathematics: 95
+Enter Credits for Mathematics: 4
+Enter Subject 2 Name: Physics
+Enter Marks for Physics: 82
+Enter Credits for Physics: 3
+Enter Subject 3 Name: Chemistry
+Enter Marks for Chemistry: 34
+Enter Credits for Chemistry: 3
+
+=================== Marks Memo =======================
+Name     : John Doe
+Year     : 2nd Year
+Semester : 4
+--------------------------------------------------------
+Sl. No. Subject               Marks  Credits    CGPA   Grade  Pass/Fail
+--------------------------------------------------------
+1       Mathematics              95        4    9.50       O          P
+2       Physics               82.00        3    8.20       B          P
+3       Chemistry             34.00        3    3.40       F          F
+--------------------------------------------------------
+Total CGPA    : 7.28/10
+Total Credits : 7/10
+Result        : F
+*/
